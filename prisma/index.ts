@@ -4,11 +4,11 @@ const prisma = new PrismaClient()
 export class UserPrismaService {
     static async getAllUsers(): Promise<User[]> {
         try {
-            const users = await prisma.user.findMany(); // Assurez-vous que cette ligne fonctionne correctement
+            const users = await prisma.user.findMany();
             return users;
         } catch (error) {
             console.error("Erreur lors de la récupération des utilisateurs :", error);
-            throw error; // Renvoie l'erreur pour être gérée plus haut dans la chaîne
+            throw error;
         }
     }
 
