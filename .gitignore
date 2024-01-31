@@ -1,3 +1,5 @@
 node_modules
 # Keep environment variables out of version control
 .env
+id_rsa_priv.pem
+id_rsa_pub.pem

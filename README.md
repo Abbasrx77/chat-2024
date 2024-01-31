@@ -11,8 +11,12 @@ This project uses [Express](https://expressjs.com/),  a minimal and flexible Nod
  ```
     npm install
  ```
-
-5. Run the project:
+5. Start the Mongo DB database using the `mongod` process.
+6. Now, you need to generate a public/private keypair.  The `.gitignore` automatically ignores the private key:
+```
+tsc generateKeypair.ts
+```
+7. Run the project:
 ```
     npm start
  ```
