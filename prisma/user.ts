@@ -3,18 +3,18 @@ const prisma = new PrismaClient()
 
 export class UserPrismaService {
     static async getAllUsers(): Promise<User[]> {
-        try {
-            const users = await prisma.user.findMany();
-            return users;
-        } catch (error) {
-            console.error("Erreur lors de la récupération des utilisateurs :", error);
-            throw error;
-        }
+        return prisma.user.findMany();
     }
 
     static async getUser(email: string): Promise<User | null> {
         return prisma.user.findUnique({
             where: {email}
+        });
+    }
+
+    static async getUserById(id: string): Promise<User | null> {
+        return prisma.user.findUnique({
+            where: {id}
         });
     }
 
@@ -24,9 +24,9 @@ export class UserPrismaService {
         });
     }
 
-    static async updateUser(email: string, user: Partial<User>): Promise<User> {
+    static async updateUser(id: string, user: Partial<User>): Promise<User> {
         return prisma.user.update({
-            where: {email},
+            where: {id},
             data: user
         });
     }

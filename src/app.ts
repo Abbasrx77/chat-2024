@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import debug0 from "debug";
 import indexRouter from "./routes";
+import contactsRouter from "./routes/contact"
 import usersRouter from "./routes/users";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
@@ -25,6 +26,7 @@ app.use(cookieParser());
 app.use(express.static(path.resolve(__dirname,"..","/public")));
 
 app.use('/index', indexRouter);
+app.use('/',contactsRouter)
 app.use('/', usersRouter);
 
 app.use(notFound)

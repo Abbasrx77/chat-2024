@@ -10,14 +10,14 @@ export type UserType  = {
 }
 
 export class User implements UserType {
-    readonly id: string;
-    readonly firstname: string;
-    readonly lastname: string;
-    readonly photoUrl: string;
-    readonly status: string;
-    readonly email: string;
-    readonly hash: string;
-    readonly salt: string;
+    id: string;
+    firstname: string;
+    lastname: string;
+    photoUrl: string;
+    status: string;
+    email: string;
+    hash: string;
+    salt: string;
 
     constructor(firstname: string, lastname: string, email: string, hash: string, salt: string) {
         this.firstname = firstname;

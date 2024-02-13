@@ -20,3 +20,13 @@ model User {
   hash      String  @db.String()
   salt      String  @db.String()
 }
+
+model Contact {
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  user1Id      String  @db.String()
+  addedAt      Int
+  user1Blocked Boolean @default(false)
+  user2Blocked Boolean @default(false)
+  status       String  @default("PENDING")
+  user2Id      String  @db.String()
+}

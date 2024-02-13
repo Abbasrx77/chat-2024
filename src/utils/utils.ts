@@ -28,51 +28,77 @@ export async function genPassword(password: string): Promise<{ salt: string, has
 }
 
 
-/**
- * @param {*} user - The user object.  We need this to set the JWT `sub` payload property to the MongoDB user ID
- */
 export function issueJWT(user) {
-    const _id = user._id;
+    const _id = user.id;
 
-    const expiresIn = '10m';
+    const expiresIn = '2d';
 
     const payload = {
         sub: _id,
         iat: Date.now(),
+        user: user,
         jti: undefined,
         aud: undefined,
     };
-    console.log(payload.sub)
 
     const signedToken = jsonwebtoken.sign(payload, PRIV_KEY, { expiresIn: expiresIn, algorithm: 'RS256' });
 
     payload.jti = jsonwebtoken.decode(signedToken).jti
     payload.aud = jsonwebtoken.decode(signedToken).aud
-
     return {
         strategy: signedToken.strategy,
         token: "Bearer " + signedToken,
         expires: expiresIn,
-        payload
+        payload: payload
     }
 }
 
+function isTokenExpired(token:jsonwebtoken):boolean {
+    const now:number = Date.now()
+    return token && token.exp && token.exp < now
+}
 export function authMiddleware(req, res, next) {
-    const tokenParts = req.headers.authorization.split(' ');
+    if(!req.headers.authorization){
+        next();
+    }else{
+        const tokenParts = req.headers.authorization.split(' ');
 
-    if (tokenParts[0] === 'Bearer' && tokenParts[1].match(/\S+\.\S+\.\S+/) !== null) {
+        if (tokenParts[0] === 'Bearer' && tokenParts[1].match(/\S+\.\S+\.\S+/) !== null) {
 
-        try {
-            const verification = jsonwebtoken.verify(tokenParts[1], PUB_KEY, { algorithms: ['RS256'] });
-            req.jwt = verification;
-            next();
-        } catch(err) {
+            try {
+                const verification = jsonwebtoken.verify(tokenParts[1], PUB_KEY, { algorithms: ['RS256'] });
+                if(isTokenExpired(verification)){
+                    res.status(401).json({
+                        msg: "The token provided has expired"
+                    })
+                }else{
+                    console.log("Token not expired")
+                    req.jwt = verification;
+                    next();
+                }
+            } catch(err) {
+                res.status(401).json({ success: false, msg: "You are not authorized to visit this route" });
+            }
+
+        } else {
             res.status(401).json({ success: false, msg: "You are not authorized to visit this route" });
         }
-
-    } else {
-        res.status(401).json({ success: false, msg: "You are not authorized to visit this route" });
     }
 
 
 }
+
+export const pick = (obj, ...keys) => {
+    return keys.reduce((result, key) => {
+        if (key in obj) {
+            result[key] = obj[key];
+        }
+        return result;
+    }, {});
+}
+
+export const getPagination = (page:number, size:number) => {
+    const limit = size ? +size :  5;
+    const offset = page ? (page -  1) * limit :  0;
+    return { limit, offset };
+};
