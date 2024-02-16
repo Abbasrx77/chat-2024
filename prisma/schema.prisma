@@ -11,15 +11,16 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  firstname String   @db.String()
-  lastname  String   @db.String()
-  photoUrl  String?  @db.String()
-  status    String?  @db.String()
-  email     String   @unique @db.String()
-  hash      String   @db.String()
-  salt      String   @db.String()
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  firstname String    @db.String()
+  lastname  String    @db.String()
+  photoUrl  String?   @db.String()
+  status    String?   @db.String()
+  email     String    @unique @db.String()
+  hash      String    @db.String()
+  salt      String    @db.String()
   members   Member[]
+  Message   Message[]
 }
 
 // TODO: Modify after to add a relation with user 1 and 2 object and refactor the controller
@@ -34,16 +35,17 @@ model Contact {
 }
 
 model Discussion {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  name        String   @db.String()
-  description String   @db.String()
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String    @db.String()
+  description String    @db.String()
   tag         Tag
-  createdBy   String   @db.ObjectId
-  photoUrl    String?  @db.String()
+  createdBy   String    @db.ObjectId
+  photoUrl    String?   @db.String()
   createdAt   Int
   updatedAt   Int
   members     Member[]
-  lastMessage Json?    @db.Json()
+  lastMessage Message[]
+  survey      Survey[]
 }
 
 enum Tag {
@@ -66,32 +68,52 @@ model Member {
 }
 
 model Message {
-  id              String     @id @default(auto()) @map("_id") @db.ObjectId
-  text            String?    @db.String
-  senderId        String     @db.ObjectId
-  surveyId        String?    @db.ObjectId
-  discusssionId   String?    @db.ObjectId
-  responseToMsgId String?    @db.ObjectId
-  file            File?      @relation(fields: [fileId], references: [id])
-  fileId          String?    @unique @db.ObjectId
-  reactions       Reactions?
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  text            String?     @db.String
+  senderId        String      @db.ObjectId
+  surveyId        String?     @db.ObjectId
+  responseToMsgId String?     @db.ObjectId
+  file            File?
+  reactions       Reactions[]
   createdAt       Int
+  Discussion      Discussion  @relation(fields: [discussionId], references: [id])
+  sender          User        @relation(fields: [senderId], references: [id])
+  discussionId    String      @db.ObjectId
 }
 
 model File {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  name      String   @db.String
-  pathUrl   String   @db.ObjectId
-  size      Int
-  type      String   @db.String
-  message   Message? @relation
-  messageId String   @db.ObjectId
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  name      String  @db.String
+  pathUrl   String  @db.String
+  size      Float
+  type      String  @db.String
+  Message   Message @relation(fields: [messageId], references: [id])
+  messageId String  @unique @db.ObjectId
 }
 
 model Reactions {
   id        String  @id @default(auto()) @map("_id") @db.ObjectId
   userId    String  @db.ObjectId
   emoji     String  @db.String
-  message   Message @relation(fields: [messageId], references: [id])
+  Message   Message @relation(fields: [messageId], references: [id])
   messageId String  @unique @db.ObjectId
+}
+
+model Survey {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  question     String
+  discussionId String     @db.ObjectId
+  creatorId    String     @db.ObjectId
+  createdAt    Int
+  endedAt      Int?
+  Discussion   Discussion @relation(fields: [discussionId], references: [id])
+  Options      Options[]
+}
+
+model Options {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  response String
+  voters   String[]
+  Survey   Survey   @relation(fields: [surveyId], references: [id])
+  surveyId String   @db.ObjectId
 }

@@ -2,6 +2,8 @@ import express from 'express';
 import path from 'path';
 import debug0 from "debug";
 import indexRouter from "./routes";
+import messageRouter from "./routes/messages";
+import surveyRouter from "./routes/survey";
 import contactsRouter from "./routes/contact"
 import discussionRouter from "./routes/discussion"
 import usersRouter from "./routes/users";
@@ -29,6 +31,8 @@ app.use(express.static(path.resolve(__dirname,"..","/public")));
 app.use('/index', indexRouter);
 app.use('/',contactsRouter)
 app.use('/',discussionRouter)
+app.use('/', messageRouter)
+app.use('/', surveyRouter)
 app.use('/', usersRouter);
 
 app.use(notFound)

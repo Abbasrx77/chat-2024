@@ -14,9 +14,17 @@ export class DiscussionPrismaService{
                 members: {
                     include: {
                         user: true,
-                        discussion: false
-                    }
-                }
+                        discussion: {
+                            include: {
+                                lastMessage: {
+                                    include: {
+                                        reactions: true
+                                    }
+                                }
+                            }
+                        }
+                    },
+                },
             }
         })
     }
@@ -37,6 +45,12 @@ export class DiscussionPrismaService{
                         discussion: false
                     },
                 },
+                lastMessage: {
+                    include: {
+                        sender: true,
+                        reactions: true
+                    }
+                }
             },
         });
     }

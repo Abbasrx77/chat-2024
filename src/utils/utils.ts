@@ -112,3 +112,24 @@ export const removeDuplicates = (data: Member[]): Member[] => {
 export const removeDuplicatesString = (data: String[]): String[] => {
     return [...new Set<String>(data)]
 }
+
+export function bytesToSize(bytes, decimals =  2) {
+    if (bytes ==  0) return '0 Bytes';
+
+    const k =  1024;
+    const dm = decimals <  0 ?  0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) / 1024 /*+ ' ' + sizes[i]*/;
+}
+
+export function getFileSize(filePath) {
+    try {
+        const stats = fs.statSync(filePath);
+        return stats.size
+    } catch (err) {
+        console.error(err.message);
+    }
+}

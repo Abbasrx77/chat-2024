@@ -1,3 +1,5 @@
+import {MessageType} from "./message";
+
 enum Tag {
     "GROUP",
     "PRIVATE"
@@ -25,7 +27,7 @@ type DiscussionType = {
     createdAt: number
     updatedAt: number
     members: Member[]
-    lastMessage: Object
+    lastMessage: MessageType
 }
 
 export class Discussion implements DiscussionType {
@@ -38,9 +40,9 @@ export class Discussion implements DiscussionType {
     createdAt: number
     updatedAt: number
     members: Member[]
-    lastMessage: Object
+    lastMessage: MessageType
 
-    constructor(name: string, description: string, tag: Tag, createdBy: string, photoUrl: string, createdAt: number, updatedAt: number, members: Member[], lastmessage: Object) {
+    constructor(name: string, description: string, tag: Tag, createdBy: string, photoUrl: string, createdAt: number, updatedAt: number, members: Member[], lastmessage: MessageType) {
         this.name = name
         this.description = description
         this.tag = tag
