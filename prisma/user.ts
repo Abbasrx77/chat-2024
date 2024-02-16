@@ -12,6 +12,22 @@ export class UserPrismaService {
         });
     }
 
+    static async getMemberId(userId: string): Promise<string>{
+        const member =  await prisma.user.findUnique({
+            where: {
+                id: userId
+            },
+            include: {
+                members: {
+                    include:{
+                        discussion: false
+                    }
+                }
+            }
+        })
+        return member.members[0].id
+    }
+
     static async getUserById(id: string): Promise<User | null> {
         return prisma.user.findUnique({
             where: {id}

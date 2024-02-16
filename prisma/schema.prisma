@@ -11,22 +11,87 @@ datasource db {
 }
 
 model User {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  firstname String  @db.String()
-  lastname  String  @db.String()
-  photoUrl  String? @db.String()
-  status    String? @db.String()
-  email     String  @unique @db.String()
-  hash      String  @db.String()
-  salt      String  @db.String()
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  firstname String   @db.String()
+  lastname  String   @db.String()
+  photoUrl  String?  @db.String()
+  status    String?  @db.String()
+  email     String   @unique @db.String()
+  hash      String   @db.String()
+  salt      String   @db.String()
+  members   Member[]
 }
 
+// TODO: Modify after to add a relation with user 1 and 2 object and refactor the controller
 model Contact {
   id           String  @id @default(auto()) @map("_id") @db.ObjectId
-  user1Id      String  @db.String()
+  user1Id      String  @db.ObjectId
   addedAt      Int
   user1Blocked Boolean @default(false)
   user2Blocked Boolean @default(false)
-  status       String  @default("PENDING")
-  user2Id      String  @db.String()
+  status       String  @default("PENDING") @db.String
+  user2Id      String  @db.ObjectId
+}
+
+model Discussion {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   @db.String()
+  description String   @db.String()
+  tag         Tag
+  createdBy   String   @db.ObjectId
+  photoUrl    String?  @db.String()
+  createdAt   Int
+  updatedAt   Int
+  members     Member[]
+  lastMessage Json?    @db.Json()
+}
+
+enum Tag {
+  GROUP
+  PRIVATE
+}
+
+model Member {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String     @db.ObjectId
+  isPinned     Boolean    @default(false)
+  hasNewNotif  Boolean    @default(true)
+  isMuted      Boolean    @default(false)
+  isAdmin      Boolean    @default(false)
+  isArchived   Boolean    @default(false)
+  addedAt      Int
+  discussionId String     @db.ObjectId
+  discussion   Discussion @relation(fields: [discussionId], references: [id])
+  user         User       @relation(fields: [userId], references: [id])
+}
+
+model Message {
+  id              String     @id @default(auto()) @map("_id") @db.ObjectId
+  text            String?    @db.String
+  senderId        String     @db.ObjectId
+  surveyId        String?    @db.ObjectId
+  discusssionId   String?    @db.ObjectId
+  responseToMsgId String?    @db.ObjectId
+  file            File?      @relation(fields: [fileId], references: [id])
+  fileId          String?    @unique @db.ObjectId
+  reactions       Reactions?
+  createdAt       Int
+}
+
+model File {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @db.String
+  pathUrl   String   @db.ObjectId
+  size      Int
+  type      String   @db.String
+  message   Message? @relation
+  messageId String   @db.ObjectId
+}
+
+model Reactions {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String  @db.ObjectId
+  emoji     String  @db.String
+  message   Message @relation(fields: [messageId], references: [id])
+  messageId String  @unique @db.ObjectId
 }

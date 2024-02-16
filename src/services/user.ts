@@ -1,6 +1,7 @@
 import {User} from "../models/user";
 import {UserPrismaService} from "../../prisma/user";
 import {getUser} from "../controllers/user";
+import {DiscussionPrismaService} from "../../prisma/discussion";
 
 export class UserService {
     static async getAllUsers(): Promise<User[] | null> {
@@ -13,6 +14,10 @@ export class UserService {
 
     static async getUserById(id: string): Promise<User | null> {
         return await UserPrismaService.getUserById(id);
+    }
+
+    static async getMemberId(userId: string): Promise<string> {
+        return await UserPrismaService.getMemberId(userId)
     }
 
     static async createUser(user: User): Promise<User> {

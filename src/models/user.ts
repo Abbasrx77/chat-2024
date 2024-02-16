@@ -9,6 +9,12 @@ export type UserType  = {
     salt: string;
 }
 
+type UserPassword = {
+    password: string
+}
+
+export type UserDetails = UserType & UserPassword
+
 export class User implements UserType {
     id: string;
     firstname: string;

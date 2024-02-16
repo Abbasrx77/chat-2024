@@ -3,6 +3,8 @@ import jsonwebtoken from "jsonwebtoken";
 import fs from "fs";
 import path from "path";
 import util from "util";
+import {Member} from "../models/discussion";
+import exp from "constants";
 const scrypt = util.promisify(crypto.scrypt) as (password: string | Buffer, salt: string | Buffer, keylen: number) => Promise<Buffer>
 
 const pathToKey = path.join(__dirname, '..','..', 'id_rsa_priv.pem');
@@ -31,7 +33,8 @@ export async function genPassword(password: string): Promise<{ salt: string, has
 export function issueJWT(user) {
     const _id = user.id;
 
-    const expiresIn = '2d';
+    const expiresIn = "1d";
+
 
     const payload = {
         sub: _id,
@@ -55,7 +58,11 @@ export function issueJWT(user) {
 
 function isTokenExpired(token:jsonwebtoken):boolean {
     const now:number = Date.now()
-    return token && token.exp && token.exp < now
+    const date = new Date(token.exp)
+    console.log(`${date.getHours()} Heures, ${date.getMinutes()} Minutes, ${date.getSeconds()} secondes`)
+    console.log(date.toString())
+    console.log(now)
+    return token.exp < now
 }
 export function authMiddleware(req, res, next) {
     if(!req.headers.authorization){
@@ -67,15 +74,10 @@ export function authMiddleware(req, res, next) {
 
             try {
                 const verification = jsonwebtoken.verify(tokenParts[1], PUB_KEY, { algorithms: ['RS256'] });
-                if(isTokenExpired(verification)){
-                    res.status(401).json({
-                        msg: "The token provided has expired"
-                    })
-                }else{
+
                     console.log("Token not expired")
                     req.jwt = verification;
                     next();
-                }
             } catch(err) {
                 res.status(401).json({ success: false, msg: "You are not authorized to visit this route" });
             }
@@ -102,3 +104,11 @@ export const getPagination = (page:number, size:number) => {
     const offset = page ? (page -  1) * limit :  0;
     return { limit, offset };
 };
+
+export const removeDuplicates = (data: Member[]): Member[] => {
+    return [...new Set<Member>(data)]
+}
+
+export const removeDuplicatesString = (data: String[]): String[] => {
+    return [...new Set<String>(data)]
+}

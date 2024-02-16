@@ -3,6 +3,7 @@ import path from 'path';
 import debug0 from "debug";
 import indexRouter from "./routes";
 import contactsRouter from "./routes/contact"
+import discussionRouter from "./routes/discussion"
 import usersRouter from "./routes/users";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
@@ -27,6 +28,7 @@ app.use(express.static(path.resolve(__dirname,"..","/public")));
 
 app.use('/index', indexRouter);
 app.use('/',contactsRouter)
+app.use('/',discussionRouter)
 app.use('/', usersRouter);
 
 app.use(notFound)

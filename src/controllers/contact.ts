@@ -3,10 +3,8 @@ import {RequestWithJwt} from "../interfaces/RequestWithJwt";
 import {NextFunction, Response} from "express";
 import {Contact} from "../models/contact";
 import {ContactService} from "../services/contact";
-import {setDefaultAutoSelectFamily} from "net";
 import {User} from "../models/user";
 import {UserService} from "../services/user";
-import contact from "../routes/contact";
 
 
 export const sendContactRequest = asyncWrapper(async (req: RequestWithJwt, res: Response, next: NextFunction): Promise<Response> => {
@@ -47,14 +45,14 @@ export const sendContactRequest = asyncWrapper(async (req: RequestWithJwt, res: 
 
 export const listContactRequest = asyncWrapper(async (req: RequestWithJwt, res: Response, next: NextFunction): Promise<Response> => {
     let {status, user2Id } = req.query
-    const statusAccepted: string[] = ["DECLINED","ACCEPTED","PENDING"]
+    const statusAccepted: string[] = ["DECLINED","VALIDATED","PENDING"]
     status = `${status}`
     user2Id = `${user2Id}`
     const user1Id = req.jwt.user.id
 
     if (!statusAccepted.includes(status)){
         return res.status(400).json({
-            msg: "Status accepted are only ACCEPTED, DECLINED and PENDING"
+            msg: "Status accepted are only VALIDATED, DECLINED and PENDING"
         })
     }else{
         if(req.query.user2Id){
@@ -70,11 +68,11 @@ export const listContactRequest = asyncWrapper(async (req: RequestWithJwt, res: 
 export const responseToRequest = asyncWrapper(async(req:RequestWithJwt, res:Response, next: NextFunction): Promise<Response> => {
     const {action, status} = req.body
     const actionAccepted: string[] = ["ANSWER_TO_REQUEST","BLOCKED_CONTACT"]
-    const statusAccepted: string[] = ["DECLINED","ACCEPTED"]
+    const statusAccepted: string[] = ["DECLINED","VALIDATED"]
 
     if (!actionAccepted.includes(action) || !statusAccepted.includes(status)){
         return res.status(400).json({
-            msg: "Status accepted are only ACCEPTED AND DECLINED and/or action accepted is ANSWER_TO_REQUEST or BLOCKED_CONTACT"
+            msg: "Status accepted are only VALIDATED AND DECLINED and/or action accepted is ANSWER_TO_REQUEST or BLOCKED_CONTACT"
         })
     }else{
         switch (action){

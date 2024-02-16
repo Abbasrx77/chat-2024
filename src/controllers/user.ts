@@ -1,5 +1,5 @@
 import {Request, Response, NextFunction} from 'express';
-import {User} from "../models/user";
+import {User, UserDetails} from "../models/user";
 import {asyncWrapper} from "../utils/async-wrapper";
 import {UserService} from "../services/user";
 import {genPassword, issueJWT, pick, validPassword} from "../utils/utils";
@@ -124,7 +124,7 @@ export const deleteUser = asyncWrapper(async(req: Request, res: Response, next: 
 
 export const updateUser = asyncWrapper(async (req:RequestFull,res:Response, next: NextFunction): Promise<Response> => {
     const jwt: jsonwebtoken = req.jwt
-    const data  = req.body;
+    const data = req.body;
     const id = jwt.user.id
 
     if (req.file){
@@ -138,17 +138,12 @@ export const updateUser = asyncWrapper(async (req:RequestFull,res:Response, next
         delete data.password
     }
 
-    const pickedUser: User = pick(
-        data,
-        [
-            "firstname",
-            "lastname",
-            "photoUrl",
-            "hash",
-            "salt"
-        ]
-    )
+    const fieldsToUpdate = Object.entries(data)
+        .filter(([key,value]) => ["firstname", "lastname", "photoUrl", "hash", "salt"]
+            .includes(key) && value !== undefined)
+        .reduce((acc,[key,value]) => ({ ...acc, [key]: value }), {})
 
-    const user: User = await UserService.updateUser(id,pickedUser)
-    return res.status(200).json(user)
+
+    const updatedUser: User = await UserService.updateUser(id,fieldsToUpdate)
+    return res.status(200).json(updatedUser)
 })

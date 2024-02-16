@@ -20,8 +20,7 @@ export class ContactPrismaService {
         })
     }
 
-    static async getContactByIdAndStatus(user1Id?: string, status?: string): Promise<any[]> {
-        console.log("Started")
+    static async getContactByIdAndStatus(user1Id?: string, status?: string): Promise<Contact[]> {
         const contacts = await prisma.contact.findMany({
             where: {
                 user1Id: user1Id,
