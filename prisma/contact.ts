@@ -21,7 +21,12 @@ export class ContactPrismaService {
     }
 
     static async getContactByIdAndStatus(user1Id?: string, status?: string): Promise<Contact[]> {
+        const limit = 10
+        const skip = 0
+        const total = await prisma.contact.count();
         const contacts = await prisma.contact.findMany({
+            skip: skip,
+            take: limit,
             where: {
                 user1Id: user1Id,
                 status: status
@@ -37,10 +42,15 @@ export class ContactPrismaService {
             });
 
             return {
-                ...contact,
-                fullname: `${user1.firstname} ${user1.lastname}`,
-                user1: user1,
-                user2: user2
+                total: total,
+                limit: limit,
+                skip: skip,
+                data: {
+                    ...contact,
+                    fullname: `${user1.firstname} ${user1.lastname}`,
+                    user1: user1,
+                    user2: user2
+                },
             };
         }));
 

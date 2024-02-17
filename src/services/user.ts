@@ -1,11 +1,11 @@
 import {User} from "../models/user";
-import {UserPrismaService} from "../../prisma/user";
+import {PaginatedUsers, UserPrismaService} from "../../prisma/user";
 import {getUser} from "../controllers/user";
 import {DiscussionPrismaService} from "../../prisma/discussion";
 
 export class UserService {
-    static async getAllUsers(): Promise<User[] | null> {
-        return await UserPrismaService.getAllUsers();
+    static async getAllUsers($limit: number, $skip: number, query?: any): Promise<PaginatedUsers | null> {
+        return await UserPrismaService.getAllUsers($limit, $skip, query);
     }
 
     static async getUser(email: string): Promise<User | null> {

@@ -35,7 +35,10 @@ export class MessagePrismaService {
 
 
     static async getMessagesOfDiscussion(discussionId: string, sort: string): Promise<Message | null> {
-        return prisma.message.findMany({
+        const limit = 20
+        const skip = 0
+        const total = await prisma.message.count();
+        const messages = await prisma.message.findMany({
             where: {
                 discussionId: discussionId
             },
@@ -47,6 +50,13 @@ export class MessagePrismaService {
                 reactions: true
             }
         })
+
+        return {
+            total: total,
+            limit: limit,
+            skip: skip,
+            data: {messages}
+        }
     }
 
 

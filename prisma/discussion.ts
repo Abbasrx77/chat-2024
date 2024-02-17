@@ -29,9 +29,13 @@ export class DiscussionPrismaService{
         })
     }
 
-    static async getDiscussionsByUserId(userId: string): Promise<Discussion[] | null> {
-        // Retrieve all discussions where the user is a member
-        return prisma.discussion.findMany({
+    static async getDiscussionsByUserId(userId: string): Promise<Discussion | null> {
+        const limit = 10
+        const skip = 0
+        const total = await prisma.discussion.count();
+        const discussions = await prisma.discussion.findMany({
+            skip: skip,
+            take: limit,
             where: {
                 members: {
                     some: {
@@ -53,10 +57,25 @@ export class DiscussionPrismaService{
                 }
             },
         });
+
+        return {
+            total: total,
+            limit: limit,
+            skip: skip,
+            data: {
+                discussions
+            }
+        }
+
     }
 
-    static async getArchivedDiscussionsByUserId(userId: string): Promise<Discussion[] | null> {
+    static async getArchivedDiscussionsByUserId(userId: string): Promise<Discussion | null> {
+        const limit = 10
+        const skip = 0
+        const total = await prisma.discussion.count();
         let discussions = await prisma.discussion.findMany({
+            skip: skip,
+            take: limit,
             where: {
                 members: {
                     some: {
@@ -82,11 +101,21 @@ export class DiscussionPrismaService{
             discussions[i].createdByUser = createdByUser;
         }
 
-        return discussions;
+        return {
+            total: total,
+            limit: limit,
+            skip: skip,
+            data: {discussions}
+        }
     }
 
-    static async getPinnedDiscussionsByUserId(userId: string): Promise<Discussion[] | null> {
+    static async getPinnedDiscussionsByUserId(userId: string): Promise<Discussion | null> {
+        const limit = 10
+        const skip = 0
+        const total = await prisma.discussion.count();
         const discussions = await prisma.discussion.findMany({
+            skip: skip,
+            take: limit,
             where: {
                 members: {
                     some: {
@@ -112,7 +141,12 @@ export class DiscussionPrismaService{
             discussions[i].createdByUser = createdByUser;
         }
 
-        return discussions;
+        return {
+            total: total,
+            limit: limit,
+            skip: skip,
+            data: {discussions}
+        }
     }
 
 

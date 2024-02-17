@@ -7,11 +7,29 @@ import {validationResult} from "express-validator";
 import jsonwebtoken from "jsonwebtoken";
 import {RequestWithJwt} from "../interfaces/RequestWithJwt";
 import {RequestFull} from "../interfaces/RequestFull";
+import {PaginatedUsers} from "../../prisma/user";
 
 
 
 export const getAllUsers = asyncWrapper(async (req: Request, res: Response, next: NextFunction): Promise<Response> => {
-    const users: User[] | null = await UserService.getAllUsers()
+    let {$limit, $skip} = req.query
+    let lim: string = `${$limit}`
+    let sk: string = `${$skip}`
+    const limit = parseInt(lim)
+    const skip = parseInt(sk)
+
+    const searchConditions = Array.isArray(req.query.$or) ? req.query.$or.map(condition => {
+        const field = Object.keys(condition)[0]; // Assuming only one field per condition
+        const regex = condition[field].$regex;
+        const options = condition[field].$options;
+        return {
+            [field]: {
+                contains: regex,
+                mode: options === 'i' ? 'insensitive' : 'sensitive'
+            }
+        };
+    }) : [];
+    const users: PaginatedUsers | null = await UserService.getAllUsers(limit, skip, searchConditions)
     return res.status(200).json(users)
 })
 

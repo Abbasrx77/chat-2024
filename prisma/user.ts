@@ -1,9 +1,42 @@
 import {PrismaClient, User} from "@prisma/client";
 const prisma = new PrismaClient()
 
+export type PaginatedUsers = {
+    total: number;
+    limit: number;
+    skip: number;
+    data: User[];
+}
+
 export class UserPrismaService {
-    static async getAllUsers(): Promise<User[]> {
-        return prisma.user.findMany();
+    static async getAllUsers($limit: number, $skip: number, query?: any): Promise<PaginatedUsers> {
+        const limit = Number($limit) ??  20
+        const skip = Number($skip) ??  0
+        const total = await prisma.user.count();
+        const users = await prisma.user.findMany({
+            skip: skip,
+            take: limit,
+            where: {
+                OR: query
+            },
+            select: {
+                hash: false,
+                salt: false,
+                id: true,
+                firstname: true,
+                lastname: true,
+                email: true,
+                photoUrl: true,
+                status: true
+            }
+        });
+
+        return {
+            total: total,
+            limit: limit,
+            skip: skip,
+            data: users
+        };
     }
 
     static async getUser(email: string): Promise<User | null> {
